@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Canvas Mouse Events</title>
+	<meta name="generator" content="TextMate http://macromates.com/">
+	<meta name="author" content="Uno Von Galixor">
+	<!-- Date: 2010-06-03 -->
+</head>
+<body>
+	
+	<script type="text/javascript" src="../../source/CanvasSpriteInit.js"></script>
+	<div id="CanvasSprite"></div>
+	<script type="text/javascript">
+	var sourcePath = "../../source";
+	include("display/CanvasSprite.js");
+	include("util/math.js");
+	
+	var eventSprite;
+	var columnsToInit = 5;
+	
+	initializeCanvasSprite("example-canvas", 500, 300, 30, init);
+	
+	function init(){
+		
+		// now we'll initialize the background columns
+		// since as of version 0.2 CanvasStage doesn't have
+		// a swap depths function, we'll do this first
+		var columnPosition = 0;
+		for(var i=0; i<columnsToInit; i++){
+			var newColumn = newCanvasSprite("column-"+columnsToInit);
+			newColumn.getBitmap("img/bg.png");
+			newColumn.width = 75;
+			newColumn.height = 298;
+			newColumn.x = columnPosition;
+			columnPosition += 100;
+		}
+		// initialize the box
+		eventSprite = newCanvasSprite("friction-square");
+		eventSprite.getBitmap("img/img.png"); // load in image into it
+		eventSprite.width = 55;
+		eventSprite.height = 55;
+		eventSprite.alpha = 0.5;
+		eventSprite.rotation = 0;
+		eventSprite.regPoint = {x:eventSprite.width/2, y:0};
+		eventSprite.x = 0;
+		eventSprite.y = 0;
+		eventSprite.drawBorder = true;
+		
+		/* EVENT LISTENERS */
+		eventSprite.addEventListener("mouse-down", "eventSprite.onMouseDown();"); // this function will begin dragging the box
+		eventSprite.addEventListener("mouse-up", "eventSprite.onMouseUp();"); // this function will release it
+		// these two functions handle the cursor change
+		eventSprite.addEventListener("mouse-over", "eventSprite.onMouseOver();"); 
+		eventSprite.addEventListener("mouse-out", "eventSprite.onMouseOut();");
+		eventSprite.addEventListener("enterframe", "eventSprite.frameFunction();"); // the frame function that will handle dragging and 
+																					// dropping the box
+		
+		eventSprite.mouseOffset = {x:0, y:0}; // click offset
+		eventSprite.mouseState = "up";
+		
+		// mock gravity code // 
+		// not physics correct //
+		eventSprite.gravitationalConstant = 2.5;
+		eventSprite.yForce = 0;
+		eventSprite.weight = 0.5;
+		
+		eventSprite.onMouseDown = function(){
+			// begin dragging
+			this.mouseState = "down";
+			// record the click offset so the box drags smoothly
+			this.mouseOffset = {x:this.x-CanvasStage.canvasMouseX, y:this.y-CanvasStage.canvasMouseY};
+		}
+		
+		eventSprite.onMouseUp = function(){
+			// end dragging
+			this.mouseState = "up";
+		}
+		
+		// cursor functions
+		eventSprite.onMouseOver = function(){
+			CanvasStage.getCanvas().style.cursor = "pointer";
+		}
+		eventSprite.onMouseOut = function(){
+			CanvasStage.getCanvas().style.cursor = "";
+		}
+		
+		eventSprite.frameFunction = function(){
+			this.rotation++;
+			if(this.mouseState == "down"){
+				// if the user has clicked on the box, move it around with the mouse
+				this.x = CanvasStage.canvasMouseX + this.mouseOffset.x;
+				this.y = CanvasStage.canvasMouseY + this.mouseOffset.y;
+			} else {
+				// if not apply the gravitational force
+				this.yForce += this.gravitationalConstant*this.weight;
+				this.y += this.yForce;
+				
+				// check for a bounce
+				if((this.y) >= CanvasStage.canvasHeight){
+					this.y = CanvasStage.canvasHeight;
+					// reverse the force (bounce up)
+					eventSprite.yForce *= -1;
+					// and reduce the force
+					eventSprite.yForce /= 1.5;
+				}
+			}
+		}
+	}
+	</script>
+	<div id="trace"></div>
+</body>
+</html>

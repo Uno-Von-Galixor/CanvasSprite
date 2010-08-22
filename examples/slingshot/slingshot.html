@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Slingshot</title>
+	
+</head>
+
+<body>
+	<script type="text/javascript" src="../../source/CanvasSpriteInit.js"></script>
+	<div id="CanvasSprite"></div>
+	<script type="text/javascript">
+	var sourcePath = "../../source";
+	include("display/CanvasSprite.js");
+	include("util/math.js");
+	
+	function initializeSlingShot(){
+		var ground = newCanvasSprite("ground");
+		ground.width = 500;
+		ground.height = 1;
+		ground.x = 0;
+		ground.y = 250;
+		ground.drawBorder = true;
+		ground.regPoint = {x:0, y:0};
+		
+		var slingshot = newCanvasSprite("slingshot");
+		slingshot.width = 150;
+		slingshot.height = 200;
+		slingshot.x = 200;
+		slingshot.y = 0;
+		slingshot.rotation = 0;
+		slingshot.getBitmap("img/fff.png");
+		slingshot.drawBorder = true;
+		slingshot.regPoint = {x:slingshot.width/2, y:slingshot.height/2};
+	}
+	
+	initializeCanvasSprite("main_canvas", 500, 400, 50, initializeSlingShot);
+	</script>
+</body>
+</html>
