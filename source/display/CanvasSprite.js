@@ -38,19 +38,13 @@ function newCanvasSprite(localID){
 			this.events[eventType] = true;
 		},
 		stateChanged: function(localProp, localOldVal, localNewVal){
-			this.stateChanged = true;
+			if((this.stateChanged != true) && (localOldVal != localNewVal)){
+				this.stateChanged = true;
+				CanvasStage.reportAlteredBounds(this.boundingBox, this.calculateCurrentBoundingBox(), this);
+			}
 			return localNewVal;
 		},
-		drawMe: function(){
-			CanvasStage.getContext().save();
-			CanvasStage.getContext().globalAlpha = this.alpha;
-			if(this.bitmapLoaded == true){
-				CanvasStage.getContext().translate(this.x+(this.regPoint.x*2), this.y+(this.regPoint.y*2));
-				if(this.rotation != 0){
-					CanvasStage.getContext().rotate(this.rotation * Math.PI / 180);
-				}
-				CanvasStage.getContext().drawImage(this.bitmap, 0-(this.regPoint.x), 0-(this.regPoint.y));
-			}
+		calculateCurrentBoundingBox:function(){
 			var x = 0-(this.regPoint.x);
 			var y = 0-(this.regPoint.y);
 			this.boundingBox.lefttop.x = x*Math.cos(this.rotation * Math.PI / 180) - y*Math.sin(this.rotation * Math.PI / 180);
@@ -61,6 +55,19 @@ function newCanvasSprite(localID){
 			this.boundingBox.rightbottom.y = (x+this.width)*Math.sin(this.rotation * Math.PI / 180) + (y+this.height)*Math.cos(this.rotation * Math.PI / 180);
 			this.boundingBox.leftbottom.x = x*Math.cos(this.rotation * Math.PI / 180) - (y+this.height)*Math.sin(this.rotation * Math.PI / 180);
 			this.boundingBox.leftbottom.y = x*Math.sin(this.rotation * Math.PI / 180) + (y+this.height)*Math.cos(this.rotation * Math.PI / 180);
+			return(this.boundingBox);
+		},
+		drawFullRect: function(){
+			CanvasStage.getContext().save();
+			CanvasStage.getContext().globalAlpha = this.alpha;
+			if(this.bitmapLoaded == true){
+				CanvasStage.getContext().translate(this.x+(this.regPoint.x*2), this.y+(this.regPoint.y*2));
+				if(this.rotation != 0){
+					CanvasStage.getContext().rotate(this.rotation * Math.PI / 180);
+				}
+				CanvasStage.getContext().drawImage(this.bitmap, 0-(this.regPoint.x), 0-(this.regPoint.y));
+			}
+			this.calculateCurrentBoundingBox();
 			
 			CanvasStage.getContext().restore();
 			

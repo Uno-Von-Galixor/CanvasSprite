@@ -9,13 +9,15 @@
 	<!-- Date: 2010-06-03 -->
 </head>
 <body>
-	<!-- Embed latest version of the CanvasSpriteLoader. This file provides the include function and initializeCanvasSprite -->
-	<script type="text/javascript" src="http://github.com/Uno-Von-Galixor/CanvasSprite/raw/master/source/CanvasSpriteLoader.js"></script>
+	<!-- Embed latest version of the CanvasSpriteLoader. This file provides the include function and initializeCanvasSprite 
+	http://github.com/Uno-Von-Galixor/CanvasSprite/raw/master/source
+	-->
+	<script type="text/javascript" src="../../source/CanvasSpriteLoader.js"></script>
 	<!-- the CanvasSprite div will contain the script loader and the canvas tag -->
 	<div id="CanvasSprite"></div>
 	<script type="text/javascript">
 	// set the source path - latest version on github
-	var sourcePath = "http://github.com/Uno-Von-Galixor/CanvasSprite/raw/master/source";
+	var sourcePath = "../../source";
 	// include scripts - must be run before initializeCanvasSprite
 	include("display/CanvasSprite.js");
 	include("util/math.js");
@@ -24,7 +26,6 @@
 	// creates the script loader div, and the canvas
 	// USAGE: initializeCanvasSprite(canvas-id, canvas-width, canvas-height, canvas-framerate, callback-function);
 	initializeCanvasSprite("example-canvas", 500, 300, 30, init);
-	
 	// the interactive box used in this example
 	var eventSprite;
 	
@@ -32,6 +33,9 @@
 	var columnsToInit = 5;
 	
 	function init(){
+		//CanvasStage.debugMode opens the trace window and places trace data there
+		//CanvasStage.debugMode = true;
+		
 		
 		// initialize the background images
 		var columnPosition = 0;
@@ -102,7 +106,7 @@
 				// if the user has clicked on the box, move it around with the mouse
 				this.x = CanvasStage.canvasMouseX + this.mouseOffset.x;
 				this.y = CanvasStage.canvasMouseY + this.mouseOffset.y;
-			} else {
+			} else if(eventSprite.mouseState != "idle") {
 				// if not apply the gravitational force
 				this.yForce += this.gravitationalConstant*this.weight;
 				this.y += this.yForce;
