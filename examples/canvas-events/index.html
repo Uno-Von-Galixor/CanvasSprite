@@ -10,32 +10,38 @@
 </head>
 <body>
 	<!-- Embed latest version of the CanvasSpriteLoader. This file provides the include function and initializeCanvasSprite 
-	
+	http://github.com/Uno-Von-Galixor/CanvasSprite/raw/master/source
 	-->
-	<script type="text/javascript" src="http://github.com/Uno-Von-Galixor/CanvasSprite/raw/master/source/CanvasSpriteLoader.js"></script>
+	<script type="text/javascript" src="../../source/CanvasSpriteLoader.js"></script>
 	<!-- the CanvasSprite div will contain the script loader and the canvas tag -->
 	<div id="CanvasSprite"></div>
 	<script type="text/javascript">
 	// set the source path - latest version on github
-	var sourcePath = "http://github.com/Uno-Von-Galixor/CanvasSprite/raw/master/source";
-	// include scripts - must be run before initializeCanvasSprite
+	var sourcePath = "../../source";
+	// include scripts 
 	include("display/CanvasSprite.js");
 	include("util/math.js");
+	
+	// preload pngs
+	// this is an required step for the drawing system to function properly
+	preload("img/bg.png");
+	preload("img/img.png");
 	
 	// initializeCanvasSprite
 	// creates the script loader div, and the canvas
 	// USAGE: initializeCanvasSprite(canvas-id, canvas-width, canvas-height, canvas-framerate, callback-function);
 	initializeCanvasSprite("example-canvas", 500, 300, 30, init);
+	
+	
+	/* EXAMPLE VARIABLES */
 	// the interactive box used in this example
 	var eventSprite;
-	
 	// variable for initializing the background images
 	var columnsToInit = 5;
 	
 	function init(){
 		//CanvasStage.debugMode opens the trace window and places trace data there
-		//CanvasStage.debugMode = true;
-		
+		CanvasStage.debugMode = true;
 		
 		// initialize the background images
 		var columnPosition = 0;
@@ -53,10 +59,10 @@
 		eventSprite.width = 55;
 		eventSprite.height = 55;
 		eventSprite.alpha = 0.5;
-		eventSprite.rotation = 45;
+		//eventSprite.rotation = 45;
 		// the registration point where x,y values are taken from. also the anchor point for rotation
-		eventSprite.regPoint = {x:eventSprite.width/2, y:0};
-		eventSprite.x = 0;
+		eventSprite.regPoint = {x:0, y:eventSprite.height};
+		eventSprite.x = 100;
 		eventSprite.y = 0;
 		eventSprite.drawBorder = true;
 		

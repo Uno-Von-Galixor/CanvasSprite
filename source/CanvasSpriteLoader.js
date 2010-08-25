@@ -1,18 +1,49 @@
 var ScriptLoader = {
-	includesComplete:function(){},
 	loadComplete:function(){
 		ScriptLoader.loadedScripts++;
 		if(ScriptLoader.loadedScripts == ScriptLoader.requestedScripts){
-			ScriptLoader.includesComplete();
+			Preloader.beginPreload();
 		}
 	},
-	callback:function(){},
 	requestedScripts:0,
 	loadedScripts:0
 }
 
+var Preloader = {
+	requestedFiles: 0,
+	loadedFiles: 0,
+	files:{},
+	beginPreload:function(){
+		for (var i in Preloader.files){
+			var ext = i.substr(i.lastIndexOf('.') + 1);
+			
+			if(ext == "png" || ext == "bmp" || ext == "jpg" || ext == "gif"){
+				Preloader.files[i] = new Image();   // Create new Image object  
+				Preloader.files[i].parent = this;
+		   		Preloader.files[i].onload = function(){
+		     		this.parent.fileLoaded();
+		   		}  
+		   		Preloader.files[i].src = i; // Set source path
+			}
+		}
+	},
+	fileLoaded:function(){
+		Preloader.loadedFiles++;
+		if(Preloader.loadedFiles == Preloader.requestedFiles){
+			Preloader.filesComplete();
+		}
+	},
+	filesComplete:function(){},
+	callback:function(){}
+}
+
 var Tracer = {
 	traceLog:""
+}
+
+function preload(localURL){
+	Preloader.requestedFiles++;
+	Preloader.files[localURL] = null;
 }
 
 function include(localFileURL){
@@ -26,10 +57,10 @@ function include(localFileURL){
 			ScriptLoader.loadComplete();
 		}
 	}
-	if(document.getElementById("CSScriptImporter") == null){
-		document.getElementById("CanvasSprite").innerHTML += "<div id='CSScriptImporter></div>";
+	if(document.getElementById("ScriptImporter") == null){
+		document.getElementById("CanvasSprite").innerHTML += "<div id='ScriptImporter></div>";
 	}
-	document.getElementById("CSScriptImporter").appendChild(newScript);
+	document.getElementById("ScriptImporter").appendChild(newScript);
 }
 
 function trace(localTraceMessage){
@@ -46,9 +77,9 @@ function initializeCanvasSprite(localCanvasTag, localWidth, localHeight, localFP
 	include("util/point.js");
 	include("display/CanvasStage.js");
 	include("event/CanvasEventDispatcher.js");
-	ScriptLoader.callback = localCallback;
-	ScriptLoader.includesComplete = function(){
+	Preloader.callback = localCallback;
+	Preloader.filesComplete = function(){
 		newCanvasStage(localCanvasTag, localFPS);
-		ScriptLoader.callback();
+		Preloader.callback();
 	}
 }

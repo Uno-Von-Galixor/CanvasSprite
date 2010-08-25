@@ -21,25 +21,26 @@ function newCanvasSprite(localID){
 		mouseOverState:false,
 		events:{},
 		drawBorder:false,
-		stateChanged:true,
+		stateChanged:false,
 		boundingBox:{"lefttop":{x:0,y:0}, "righttop":{x:0,y:0}, "rightbottom":{x:0,y:0}, "leftbottom":{x:0,y:0}},
 		init: function(){
 			// watch for drawing changes
-			this.watch("x", this.stateChanged);
-			this.watch("y", this.stateChanged);
-			this.watch("width", this.stateChanged);
-			this.watch("height", this.stateChanged);
-			this.watch("rotation", this.stateChanged);
-			this.watch("alpha", this.stateChanged);
+			this.watch("x", this.varChange);
+			this.watch("y", this.varChange);
+			this.watch("width", this.varChange);
+			this.watch("height", this.varChange);
+			this.watch("rotation", this.varChange);
+			this.watch("alpha", this.varChange);
+			this.stateChanged = false;
 			CanvasStage.addChild(this);
 		},
 		addEventListener: function(eventType, eventFunction){
 			CanvasEventDispatcher.addEventListener(eventType, eventFunction, this);
 			this.events[eventType] = true;
 		},
-		stateChanged: function(localProp, localOldVal, localNewVal){
+		varChange: function(localProp, localOldVal, localNewVal){
 			if((this.stateChanged != true) && (localOldVal != localNewVal)){
-				this.stateChanged = true;
+				this.stateChanged = true;	
 				CanvasStage.reportAlteredBounds(this.boundingBox, this.calculateCurrentBoundingBox(), this);
 			}
 			return localNewVal;
@@ -61,7 +62,7 @@ function newCanvasSprite(localID){
 			CanvasStage.getContext().save();
 			CanvasStage.getContext().globalAlpha = this.alpha;
 			if(this.bitmapLoaded == true){
-				CanvasStage.getContext().translate(this.x+(this.regPoint.x*2), this.y+(this.regPoint.y*2));
+				CanvasStage.getContext().translate(this.x, this.y);
 				if(this.rotation != 0){
 					CanvasStage.getContext().rotate(this.rotation * Math.PI / 180);
 				}
@@ -71,15 +72,13 @@ function newCanvasSprite(localID){
 			
 			CanvasStage.getContext().restore();
 			
-			x = this.x+(this.regPoint.x*2);
-			y = this.y+(this.regPoint.y*2);
 			if(this.drawBorder == true){
 				CanvasStage.getContext().beginPath();
-				CanvasStage.getContext().moveTo(this.boundingBox.lefttop.x+x,this.boundingBox.lefttop.y+y); 
-				CanvasStage.getContext().lineTo(this.boundingBox.righttop.x+x,this.boundingBox.righttop.y+y);
-				CanvasStage.getContext().lineTo(this.boundingBox.rightbottom.x+x,this.boundingBox.rightbottom.y+y);
-				CanvasStage.getContext().lineTo(this.boundingBox.leftbottom.x+x,this.boundingBox.leftbottom.y+y);
-				CanvasStage.getContext().lineTo(this.boundingBox.lefttop.x+x,this.boundingBox.lefttop.y+y);
+				CanvasStage.getContext().moveTo(this.boundingBox.lefttop.x+this.x,this.boundingBox.lefttop.y+this.y); 
+				CanvasStage.getContext().lineTo(this.boundingBox.righttop.x+this.x,this.boundingBox.righttop.y+this.y);
+				CanvasStage.getContext().lineTo(this.boundingBox.rightbottom.x+this.x,this.boundingBox.rightbottom.y+this.y);
+				CanvasStage.getContext().lineTo(this.boundingBox.leftbottom.x+this.x,this.boundingBox.leftbottom.y+this.y);
+				CanvasStage.getContext().lineTo(this.boundingBox.lefttop.x+this.x,this.boundingBox.lefttop.y+this.y);
 				CanvasStage.getContext().stroke();
 			}
 			this.stateChanged = false;
@@ -88,12 +87,12 @@ function newCanvasSprite(localID){
 			this.mouseOver = false;
 			if(this.events["mouse-down"] == true){
 				var points = new Array();
-				var x = this.x+(this.regPoint.x*2);
-				var y = this.y+(this.regPoint.y*2);
-				points.push({x:this.boundingBox.lefttop.x+x, y:this.boundingBox.lefttop.y+y});
-				points.push({x:this.boundingBox.righttop.x+x, y:this.boundingBox.righttop.y+y});
-				points.push({x:this.boundingBox.rightbottom.x+x, y:this.boundingBox.rightbottom.y+y});
-				points.push({x:this.boundingBox.leftbottom.x+x, y:this.boundingBox.leftbottom.y+y});
+				var x = this.x-(this.regPoint.x);
+				var y = this.y-(this.regPoint.y);
+				points.push({x:this.boundingBox.lefttop.x+this.x, y:this.boundingBox.lefttop.y+this.y});
+				points.push({x:this.boundingBox.righttop.x+this.x, y:this.boundingBox.righttop.y+this.y});
+				points.push({x:this.boundingBox.rightbottom.x+this.x, y:this.boundingBox.rightbottom.y+this.y});
+				points.push({x:this.boundingBox.leftbottom.x+this.x, y:this.boundingBox.leftbottom.y+this.y});
 				
 				if(point.isPointInPoly(points, {x:CanvasStage.canvasMouseX, y:CanvasStage.canvasMouseY}) == true){
 					this.mouseOver = true;
@@ -102,12 +101,8 @@ function newCanvasSprite(localID){
 			return(this.mouseOver);
 		},
 		getBitmap: function(localSource){
-		   	this.bitmap = new Image();   // Create new Image object  
-			this.bitmap.parent = this;
-		   	this.bitmap.onload = function(){
-		     	this.parent.bitmapLoaded = true;
-		   	}  
-		   	this.bitmap.src = localSource; // Set source path
+			this.bitmap = Preloader.files[localSource];
+			this.bitmapLoaded = true;
 		}
 	}
 	NewSprite.init();
